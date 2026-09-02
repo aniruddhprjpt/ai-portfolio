@@ -11,10 +11,10 @@ export const portfolioData = {
   email: "aniruddhprajapati884@gmail.com",
   phone: "07767932699",
   location: "Beckenham, Kent, UK",
-  bio: `I'm a motivated Computer Science student at Richmond, The American International University, with hands-on experience in full-stack development, machine learning, and database management.
+  bio: `I'm a motivated Computer Science graduate from Richmond, The American International University, with hands-on experience in full-stack development, machine learning, and database management.
 I have a builder mindset with a proven ability to design, develop, and deploy end-to-end systems — demonstrated through SmartDine, an AI-enhanced restaurant management platform I built as my dissertation project.
 I'm passionate about combining web development with machine learning to create intelligent, real-world applications.
-I'm currently open to graduate roles, internships, and exciting projects in full-stack or ML engineering.`,
+I'm currently open to graduate roles and exciting projects in full-stack or ML engineering.`,
 
   // ----------------------------------------------------------
   // SOCIAL / CONTACT LINKS
@@ -86,7 +86,7 @@ I'm currently open to graduate roles, internships, and exciting projects in full
     {
       institution: "Richmond, The American International University",
       degree: "Bachelor of Science in Computer Science",
-      duration: "Jan 2023 – Present (Expected May 2026)",
+      duration: "Jan 2023 – May 2026",
       grade: "Coursework in web development, machine learning, HCI/UX, and cybersecurity",
     },
     {
@@ -145,7 +145,7 @@ I'm currently open to graduate roles, internships, and exciting projects in full
   // CERTIFICATIONS (add yours here if any)
   // ----------------------------------------------------------
   certifications: [
-    "BSc Computer Science — Richmond, The American International University (Expected May 2026)",
+    "BSc Computer Science — Richmond, The American International University (Graduated May 2026)",
   ],
 
   // ----------------------------------------------------------
