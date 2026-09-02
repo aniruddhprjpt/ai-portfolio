@@ -297,6 +297,35 @@ body {
 }
 
 /* ============================================================
+   CURSOR RING SPIN
+============================================================ */
+@keyframes cursor-ring-spin {
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* ============================================================
+   CLIP-PATH WIPE — premium section reveals
+============================================================ */
+.clip-wipe {
+  clip-path: inset(0 100% 0 0);
+  animation: clip-wipe-in 0.7s var(--ease-out-expo) forwards;
+}
+@keyframes clip-wipe-in {
+  to { clip-path: inset(0 0% 0 0); }
+}
+
+/* ============================================================
+   GLOW PULSE — ambient glow on enter
+============================================================ */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 32px oklch(0.72 0.17 52 / 0.12); }
+  50%       { box-shadow: 0 0 64px oklch(0.72 0.17 52 / 0.28); }
+}
+.glow-pulse-anim {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+/* ============================================================
    REDUCED MOTION
 ============================================================ */
 @media (prefers-reduced-motion: reduce) {

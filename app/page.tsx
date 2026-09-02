@@ -6,6 +6,8 @@ import Typewriter from "@/components/Typewriter";
 import FMReveal from "@/components/FMReveal";
 import Navbar from "@/components/Navbar";
 import CustomCursor from "@/components/CustomCursor";
+import ScrollProgress from "@/components/ScrollProgress";
+import ScrambleText from "@/components/ScrambleText";
 import { portfolioData } from "@/data/portfolio";
 
 /* ─── SVG Icons ─────────────────────────────────────────── */
@@ -92,8 +94,24 @@ export default function Home() {
   const { name, bio, links, skills, experience, education, projects, email, languages } = portfolioData;
   const firstName = name.split(" ")[0];
 
+  /* Mouse parallax for hero */
+  const rawX = useMotionValue(0);
+  const rawY = useMotionValue(0);
+  const parallaxX = useSpring(rawX, { stiffness: 40, damping: 22, mass: 1 });
+  const parallaxY = useSpring(rawY, { stiffness: 40, damping: 22, mass: 1 });
+
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      rawX.set((e.clientX / window.innerWidth  - 0.5) * 22);
+      rawY.set((e.clientY / window.innerHeight - 0.5) * 12);
+    };
+    window.addEventListener("mousemove", onMove, { passive: true });
+    return () => window.removeEventListener("mousemove", onMove);
+  }, [rawX, rawY]);
+
   return (
     <main style={{ background: "var(--color-bg)", color: "var(--color-ink)", overflowX: "hidden" }}>
+      <ScrollProgress />
       <CustomCursor />
       <Navbar firstName={firstName} email={email} />
 
@@ -125,12 +143,26 @@ export default function Home() {
             pointerEvents: "none",
           }}
         />
+        {/* Scan line — amber shimmer sweeps once on load */}
+        <motion.div
+          aria-hidden
+          initial={{ y: "-100%", opacity: 0.6 }}
+          animate={{ y: "120vh", opacity: 0 }}
+          transition={{ duration: 1.4, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          style={{
+            position: "absolute", left: 0, right: 0,
+            height: 1,
+            background: "linear-gradient(90deg, transparent, oklch(0.72 0.17 52 / 0.6), transparent)",
+            pointerEvents: "none",
+            zIndex: 1,
+          }}
+        />
 
         <div className="max-w-7xl mx-auto px-6 py-20 flex flex-col justify-center min-h-screen">
           <div className="grid md:grid-cols-[1fr_320px] gap-12 items-center">
 
-            {/* LEFT: main content */}
-            <div>
+            {/* LEFT: main content — with mouse parallax */}
+            <motion.div style={{ x: parallaxX, y: parallaxY }}>
               {/* Mono label */}
               <motion.p
                 initial={{ opacity: 0, x: -16 }}
@@ -170,7 +202,7 @@ export default function Home() {
                     color: "var(--color-primary)",
                   }}
                 >
-                  Prajapati
+                  <ScrambleText text="Prajapati" delay={500} />
                 </motion.h1>
               </div>
 
@@ -236,7 +268,7 @@ export default function Home() {
                   <LinkedInIcon />
                 </a>
               </motion.div>
-            </div>
+            </motion.div>{/* end parallax wrapper */}
 
             {/* RIGHT: info card */}
             <motion.div
@@ -405,8 +437,9 @@ export default function Home() {
             {projects.map((project, i) => (
               <FMReveal key={project.name} delay={i * 0.08}>
                 <motion.div
-                  whileHover={{ x: 6 }}
-                  transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                  initial="rest"
+                  whileHover="hover"
+                  animate="rest"
                   style={{
                     padding: "2rem 0",
                     borderBottom: "1px solid var(--color-border)",
@@ -414,12 +447,32 @@ export default function Home() {
                     gridTemplateColumns: "3rem 1fr auto",
                     gap: "1.5rem",
                     alignItems: "start",
+                    position: "relative",
                   }}
                 >
-                  {/* Index */}
-                  <span className="font-display font-extrabold" style={{ fontSize: "1.1rem", color: "var(--color-primary)", paddingTop: "0.2rem" }}>
+                  {/* Amber left accent line — draws in on hover */}
+                  <motion.div
+                    variants={{ rest: { scaleY: 0, opacity: 0 }, hover: { scaleY: 1, opacity: 1 } }}
+                    transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                    style={{
+                      position: "absolute",
+                      left: -24,
+                      top: 0, bottom: 0,
+                      width: 2,
+                      background: "var(--color-primary)",
+                      transformOrigin: "top",
+                      borderRadius: 1,
+                    }}
+                  />
+                  {/* Index — scales up on row hover via variant propagation */}
+                  <motion.span
+                    variants={{ rest: { scale: 1, color: "oklch(0.72 0.17 52)" }, hover: { scale: 1.15, color: "oklch(0.82 0.17 52)" } }}
+                    transition={{ duration: 0.18 }}
+                    className="font-display font-extrabold"
+                    style={{ fontSize: "1.1rem", paddingTop: "0.2rem", display: "block" }}
+                  >
                     {String(i + 1).padStart(2, "0")}
-                  </span>
+                  </motion.span>
 
                   {/* Content */}
                   <div>

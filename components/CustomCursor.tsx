@@ -1,130 +1,113 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { motion, useSpring, useMotionValue } from "framer-motion";
+import { motion, useMotionValue, useSpring } from "framer-motion";
 
 export default function CustomCursor() {
-  const mx = useMotionValue(-100);
-  const my = useMotionValue(-100);
+  const mx = useMotionValue(-200);
+  const my = useMotionValue(-200);
 
-  const springCfg = { stiffness: 480, damping: 34, mass: 0.6 };
+  const springCfg = { stiffness: 380, damping: 30, mass: 0.5 };
   const x = useSpring(mx, springCfg);
   const y = useSpring(my, springCfg);
 
   const [hovered, setHovered] = useState(false);
   const [clicking, setClicking] = useState(false);
-  const rafRef = useRef<number | null>(null);
+  const raf = useRef<number | null>(null);
 
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      rafRef.current = requestAnimationFrame(() => {
+      if (raf.current) cancelAnimationFrame(raf.current);
+      raf.current = requestAnimationFrame(() => {
         mx.set(e.clientX);
         my.set(e.clientY);
       });
+      const el = e.target as HTMLElement;
+      setHovered(!!el.closest("a, button, [role=button]"));
     };
     const onDown = () => setClicking(true);
     const onUp   = () => setClicking(false);
 
-    const checkHover = (e: MouseEvent) => {
-      const el = e.target as HTMLElement;
-      setHovered(
-        !!el.closest("a, button, [role=button], input, textarea, select, label")
-      );
-    };
-
     window.addEventListener("mousemove", onMove, { passive: true });
-    window.addEventListener("mousemove", checkHover, { passive: true });
     window.addEventListener("mousedown", onDown);
-    window.addEventListener("mouseup", onUp);
+    window.addEventListener("mouseup",   onUp);
     return () => {
       window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("mousemove", checkHover);
       window.removeEventListener("mousedown", onDown);
-      window.removeEventListener("mouseup", onUp);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      window.removeEventListener("mouseup",   onUp);
+      if (raf.current) cancelAnimationFrame(raf.current);
     };
   }, [mx, my]);
 
-  const size = clicking ? 12 : hovered ? 28 : 20;
-  const lineLen = clicking ? 8 : hovered ? 18 : 14;
-
   return (
     <motion.div
-      style={{ x, y, translateX: "-50%", translateY: "-50%" }}
-      className="fixed top-0 left-0 z-[9999] pointer-events-none"
+      style={{
+        x, y,
+        translateX: "-50%",
+        translateY: "-50%",
+        position: "fixed",
+        top: 0, left: 0,
+        zIndex: 9999,
+        pointerEvents: "none",
+        mixBlendMode: "normal",
+      }}
     >
-      {/* Center circle */}
+      {/* Center dot */}
       <motion.div
         animate={{
-          width: size,
-          height: size,
-          backgroundColor: hovered
-            ? "oklch(0.72 0.17 52)"
-            : "transparent",
-          borderColor: "oklch(0.72 0.17 52)",
-          borderWidth: clicking ? 2 : 1.5,
+          width:  clicking ? 3 : hovered ? 6 : 5,
+          height: clicking ? 3 : hovered ? 6 : 5,
+          opacity: 1,
         }}
-        transition={{ duration: 0.15, ease: "easeOut" }}
-        style={{ borderRadius: "50%", border: "1.5px solid oklch(0.72 0.17 52)" }}
+        transition={{ duration: 0.12 }}
+        style={{
+          borderRadius: "50%",
+          background: "oklch(0.72 0.17 52)",
+          position: "absolute",
+          top: "50%", left: "50%",
+          transform: "translate(-50%, -50%)",
+        }}
       />
 
-      {/* Crosshair lines */}
-      {/* Top */}
+      {/* Rotating text ring */}
       <motion.div
-        animate={{ height: lineLen, opacity: hovered ? 0.5 : 1 }}
-        transition={{ duration: 0.15 }}
+        animate={{
+          scale: clicking ? 0.7 : hovered ? 1.3 : 1,
+          opacity: hovered ? 0.7 : 1,
+        }}
+        transition={{ duration: 0.2 }}
         style={{
           position: "absolute",
-          left: "50%",
-          bottom: "calc(50% + 3px)",
-          width: "1px",
-          background: "oklch(0.72 0.17 52)",
-          translateX: "-50%",
-          transformOrigin: "bottom",
+          top: "50%", left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: 72, height: 72,
+          animation: "cursor-ring-spin 7s linear infinite",
         }}
-      />
-      {/* Bottom */}
-      <motion.div
-        animate={{ height: lineLen, opacity: hovered ? 0.5 : 1 }}
-        transition={{ duration: 0.15 }}
-        style={{
-          position: "absolute",
-          left: "50%",
-          top: "calc(50% + 3px)",
-          width: "1px",
-          background: "oklch(0.72 0.17 52)",
-          translateX: "-50%",
-          transformOrigin: "top",
-        }}
-      />
-      {/* Left */}
-      <motion.div
-        animate={{ width: lineLen, opacity: hovered ? 0.5 : 1 }}
-        transition={{ duration: 0.15 }}
-        style={{
-          position: "absolute",
-          top: "50%",
-          right: "calc(50% + 3px)",
-          height: "1px",
-          background: "oklch(0.72 0.17 52)",
-          translateY: "-50%",
-          transformOrigin: "right",
-        }}
-      />
-      {/* Right */}
-      <motion.div
-        animate={{ width: lineLen, opacity: hovered ? 0.5 : 1 }}
-        transition={{ duration: 0.15 }}
-        style={{
-          position: "absolute",
-          top: "50%",
-          left: "calc(50% + 3px)",
-          height: "1px",
-          background: "oklch(0.72 0.17 52)",
-          translateY: "-50%",
-          transformOrigin: "left",
-        }}
-      />
+      >
+        <svg
+          width="72"
+          height="72"
+          viewBox="0 0 72 72"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <path
+              id="cursorCircle"
+              d="M 36, 36 m -28, 0 a 28,28 0 1,1 56,0 a 28,28 0 1,1 -56,0"
+            />
+          </defs>
+          <text
+            fill="oklch(0.72 0.17 52)"
+            fontSize="7.5"
+            fontFamily="var(--font-geist-mono), monospace"
+            letterSpacing="2.5"
+          >
+            <textPath href="#cursorCircle">
+              ANIRUDDH · DEV · 2026 ·{" "}
+            </textPath>
+          </text>
+        </svg>
+      </motion.div>
     </motion.div>
   );
 }
