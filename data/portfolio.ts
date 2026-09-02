@@ -30,13 +30,15 @@ I'm currently open to graduate roles and exciting projects in full-stack or ML e
   // SKILLS
   // ----------------------------------------------------------
   skills: {
-    languages: ["Python", "Java", "C", "SQL"],
-    web_development: ["HTML", "CSS", "JavaScript", "React", "Django"],
-    databases: ["PostgreSQL", "MySQL", "SQLite"],
-    machine_learning: ["TensorFlow", "PyTorch", "scikit-learn"],
-    devops_tools: ["Docker", "Git", "GitHub", "Google Colab"],
+    languages: ["Python", "Java", "C", "SQL", "TypeScript", "JavaScript"],
+    web_development: ["Next.js", "React", "React 19", "HTML", "CSS", "Tailwind CSS", "Django", "REST API"],
+    databases: ["PostgreSQL", "MySQL", "SQLite", "Supabase"],
+    ai_and_ml: ["Claude API", "Groq API", "LLaMA", "scikit-learn", "TensorFlow", "PyTorch"],
+    auth_and_backend: ["Supabase Auth", "Google OAuth", "GitHub OAuth", "JWT", "Row-Level Security", "Supabase Realtime"],
+    devops_tools: ["Docker", "Vercel", "Git", "GitHub", "Google Colab"],
+    integrations: ["OCR.space", "WebGL (OGL)", "DiceBear", "Cloudflare Speed Test API", "postcodes.io"],
     data_analysis: ["IBM SPSS Statistics", "Microsoft Excel"],
-    design_ux: ["Figma"],
+    design_ux: ["Figma", "Glassmorphism UI", "Dark Mode / Light Mode Theming"],
     professional: [
       "Team Collaboration",
       "Time Management",
