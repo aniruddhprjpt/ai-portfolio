@@ -117,6 +117,36 @@ I'm currently open to graduate roles and exciting projects in full-stack or ML e
       ],
     },
     {
+      name: "StudyMind AI — Study Smarter. Not Harder.",
+      description:
+        "A full-stack AI-powered study platform that transforms documents into interactive learning tools. Upload a PDF or DOCX and instantly get AI summaries, chat with your document, auto-generated flashcards, mind maps, quizzes, and a personalised study plan — all with a stunning dark glassmorphism UI and WebGL 3D animated backgrounds.",
+      tech: ["Next.js", "TypeScript", "Tailwind CSS", "Groq API", "LLaMA", "Supabase", "Google OAuth", "WebGL", "Vercel"],
+      github: "https://github.com/aniruddhprjpt/studymind-ai",
+      live: "https://studymind-ai-mu.vercel.app",
+      highlights: [
+        "Upload PDF/DOCX and get instant AI summaries, flashcards, mind maps, and quizzes powered by LLaMA via Groq API",
+        "AI Chat with your document — ask anything, get context-aware answers from your own notes",
+        "Formula Extractor for STEM subjects, AI Study Plan generator, and Weak Area Tracker with Progress Dashboard",
+        "Multi-tenant auth via Supabase (Google & GitHub OAuth) — every user has private document history; guest mode available",
+        "3D WebGL animated UI (OGL Strands), MagicBento cursor-glow panels, onboarding modal with 3D step animations",
+      ],
+    },
+    {
+      name: "FlatFlow — Shared House Management App",
+      description:
+        "A full-stack shared-house management web app with chores, budget tracking, cooking rota, bin collection reminders, an anonymous feedback wall, and live Wi-Fi speed testing — all synced in real-time across the household. Built as the web companion to a React Native mobile app, sharing the same Supabase backend.",
+      tech: ["Next.js", "React 19", "TypeScript", "Tailwind CSS v4", "Supabase", "PostgreSQL", "Supabase Realtime", "Google OAuth", "Vercel"],
+      github: "https://github.com/aniruddhprjpt",
+      live: "https://web-rho-ashy-33.vercel.app",
+      highlights: [
+        "Role-based auth (admin/member) enforced at the database level via Supabase RLS — not just the UI; invite-code house onboarding",
+        "Chore & cooking rotas with gender-split rotation and consent-based swap requests — both parties must accept before a swap lands",
+        "Budget tracker with receipt OCR scanning, admin-assigned contributions, real-time pot updates on member confirmation",
+        "Reverse-engineered OCR API's label/price text ordering with a bounding-box algorithm to reconstruct real receipt rows before parsing",
+        "Root-caused a React modal bug silently stealing keyboard focus mid-typing on iOS Safari — reproduced live in production before and after the fix",
+      ],
+    },
+    {
       name: "AI Portfolio Assistant",
       description:
         "An interactive portfolio website with an embedded AI chatbot powered by Claude API. Visitors can ask questions about my experience, projects, and skills in natural language — no more reading static pages.",
