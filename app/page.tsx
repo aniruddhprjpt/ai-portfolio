@@ -31,7 +31,7 @@ export default function Home() {
       {/* ── NAV ── */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-[#07070f]/70 backdrop-blur-xl border-b border-white/5">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <span className="font-bold text-xl gradient-text tracking-tight">{firstName}<span className="text-white/30">.dev</span></span>
+          <span className="font-heading font-bold text-xl gradient-text tracking-tight">{firstName}<span className="text-white/30">.dev</span></span>
           <div className="hidden md:flex gap-8 text-sm text-gray-400">
             {["About", "Projects", "Skills", "Experience", "Contact"].map((item) => (
               <a key={item} href={`#${item.toLowerCase()}`}
@@ -68,7 +68,7 @@ export default function Home() {
           </div>
 
           {/* Heading */}
-          <h1 className="text-5xl md:text-7xl font-black mb-4 leading-tight tracking-tight">
+          <h1 className="font-heading text-5xl md:text-7xl font-black mb-4 leading-tight tracking-tight">
             Hi, I&apos;m <span className="glow-text">{firstName}</span>
           </h1>
 
@@ -126,7 +126,7 @@ export default function Home() {
         <div className="max-w-5xl mx-auto">
           <ScrollReveal>
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-black mb-3 section-title">About <span className="gradient-text">Me</span></h2>
+              <h2 className="font-heading text-4xl font-black mb-3 section-title">About <span className="gradient-text">Me</span></h2>
             </div>
           </ScrollReveal>
 
@@ -157,7 +157,7 @@ export default function Home() {
                 ].map(({ label, value, icon }) => (
                   <div key={label} className="card-glow shimmer rounded-2xl p-6 text-center">
                     <div className="text-2xl mb-1">{icon}</div>
-                    <p className="text-3xl font-black gradient-text">{value}</p>
+                    <p className="font-heading text-3xl font-black gradient-text">{value}</p>
                     <p className="text-gray-500 text-xs mt-1">{label}</p>
                   </div>
                 ))}
@@ -173,7 +173,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto relative">
           <ScrollReveal>
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-black mb-3 section-title">My <span className="gradient-text">Projects</span></h2>
+              <h2 className="font-heading text-4xl font-black mb-3 section-title">My <span className="gradient-text">Projects</span></h2>
               <p className="text-gray-500 mt-6">Things I've built that I'm proud of</p>
             </div>
           </ScrollReveal>
@@ -188,7 +188,7 @@ export default function Home() {
                       <div className="text-2xl mb-1">
                         {i === 0 ? "🍽️" : i === 1 ? "🤖" : "💡"}
                       </div>
-                      <h3 className="font-bold text-lg text-white leading-tight">{project.name}</h3>
+                      <h3 className="font-heading font-bold text-lg text-white leading-tight">{project.name}</h3>
                     </div>
                     <div className="flex gap-2 ml-3 flex-shrink-0">
                       {project.live && (
@@ -238,7 +238,7 @@ export default function Home() {
         <div className="max-w-5xl mx-auto">
           <ScrollReveal>
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-black mb-3 section-title">Tech <span className="gradient-text">Stack</span></h2>
+              <h2 className="font-heading text-4xl font-black mb-3 section-title">Tech <span className="gradient-text">Stack</span></h2>
               <p className="text-gray-500 mt-6">Technologies I work with</p>
             </div>
           </ScrollReveal>
@@ -268,7 +268,7 @@ export default function Home() {
         <div className="max-w-4xl mx-auto relative">
           <ScrollReveal>
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-black mb-3 section-title">Work <span className="gradient-text">Experience</span></h2>
+              <h2 className="font-heading text-4xl font-black mb-3 section-title">Work <span className="gradient-text">Experience</span></h2>
               <p className="text-gray-500 mt-6">My professional journey</p>
             </div>
           </ScrollReveal>
@@ -286,7 +286,7 @@ export default function Home() {
                     <div className="card-glow rounded-2xl p-7">
                       <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
                         <div>
-                          <h3 className="font-black text-lg text-white">{job.role}</h3>
+                          <h3 className="font-heading font-black text-lg text-white">{job.role}</h3>
                           <p className="gradient-text font-semibold">{job.company}</p>
                         </div>
                         <div className="text-right text-sm">
@@ -312,7 +312,7 @@ export default function Home() {
           {/* Education */}
           <ScrollReveal delay={1}>
             <div className="mt-16">
-              <h3 className="text-2xl font-black mb-8 text-center">
+              <h3 className="font-heading text-2xl font-black mb-8 text-center">
                 <span className="gradient-text">Education</span>
               </h3>
               <div className="space-y-4">
@@ -338,7 +338,7 @@ export default function Home() {
       <section id="contact" className="py-28 px-6 relative z-10">
         <div className="max-w-2xl mx-auto text-center">
           <ScrollReveal>
-            <h2 className="text-4xl font-black mb-4 section-title">
+            <h2 className="font-heading text-4xl font-black mb-4 section-title">
               Let&apos;s <span className="gradient-text">Connect</span>
             </h2>
             <p className="text-gray-400 mt-8 mb-10 leading-relaxed text-lg">
