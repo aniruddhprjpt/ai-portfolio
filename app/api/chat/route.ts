@@ -32,7 +32,9 @@ Never make up information. Only use the data provided below.
 - Programming Languages: ${skills.languages.join(", ")}
 - Web Development: ${skills.web_development.join(", ")}
 - Databases: ${skills.databases.join(", ")}
-- Machine Learning: ${skills.machine_learning.join(", ")}
+- AI & ML: ${skills.ai_and_ml.join(", ")}
+- Auth & Backend: ${skills.auth_and_backend.join(", ")}
+- Integrations: ${skills.integrations.join(", ")}
 - DevOps & Tools: ${skills.devops_tools.join(", ")}
 - Data & Analysis: ${skills.data_analysis.join(", ")}
 - Design & UX: ${skills.design_ux.join(", ")}
