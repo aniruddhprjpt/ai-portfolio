@@ -5,9 +5,9 @@ import Chatbot from "@/components/Chatbot";
 import Typewriter from "@/components/Typewriter";
 import FMReveal from "@/components/FMReveal";
 import Navbar from "@/components/Navbar";
-import CustomCursor from "@/components/CustomCursor";
 import ScrollProgress from "@/components/ScrollProgress";
 import ScrambleText from "@/components/ScrambleText";
+import GridBloom from "@/components/GridBloom";
 import { portfolioData } from "@/data/portfolio";
 
 /* ─── SVG Icons ─────────────────────────────────────────── */
@@ -112,35 +112,26 @@ export default function Home() {
   return (
     <main style={{ background: "var(--color-bg)", color: "var(--color-ink)", overflowX: "hidden" }}>
       <ScrollProgress />
-      <CustomCursor />
       <Navbar firstName={firstName} email={email} />
 
       {/* ══════════════════════════════════════════
           HERO — left-aligned asymmetric
       ══════════════════════════════════════════ */}
-      <section className="relative min-h-screen grid-bg" style={{ paddingTop: "6rem" }}>
-        {/* Subtle amber glow top-right */}
-        <div
-          aria-hidden
-          style={{
-            position: "absolute", top: -100, right: -100,
-            width: 500, height: 500,
-            borderRadius: "50%",
-            background: "oklch(0.72 0.17 52 / 0.07)",
-            filter: "blur(80px)",
-            pointerEvents: "none",
-          }}
-        />
-        {/* Subtle cyan glow bottom-left */}
+      <section className="relative min-h-screen" style={{ paddingTop: "6rem" }}>
+        {/* WebGL animated grid bloom — amber, mouse-reactive */}
+        <GridBloom color="#c87533" speed={0.5} gridScale={13} />
+
+        {/* Subtle cyan glow bottom-left (layered over WebGL) */}
         <div
           aria-hidden
           style={{
             position: "absolute", bottom: 0, left: -80,
             width: 400, height: 400,
             borderRadius: "50%",
-            background: "oklch(0.70 0.15 192 / 0.06)",
+            background: "oklch(0.70 0.15 192 / 0.05)",
             filter: "blur(80px)",
             pointerEvents: "none",
+            zIndex: 1,
           }}
         />
         {/* Scan line — amber shimmer sweeps once on load */}
@@ -154,11 +145,11 @@ export default function Home() {
             height: 1,
             background: "linear-gradient(90deg, transparent, oklch(0.72 0.17 52 / 0.6), transparent)",
             pointerEvents: "none",
-            zIndex: 1,
+            zIndex: 3,
           }}
         />
 
-        <div className="max-w-7xl mx-auto px-6 py-20 flex flex-col justify-center min-h-screen">
+        <div className="max-w-7xl mx-auto px-6 py-20 flex flex-col justify-center min-h-screen" style={{ position: "relative", zIndex: 2 }}>
           <div className="grid md:grid-cols-[1fr_320px] gap-12 items-center">
 
             {/* LEFT: main content — with mouse parallax */}
