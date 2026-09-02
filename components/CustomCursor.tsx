@@ -1,43 +1,130 @@
 "use client";
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { motion, useSpring, useMotionValue } from "framer-motion";
 
 export default function CustomCursor() {
-  const [pos, setPos] = useState({ x: -100, y: -100 });
-  const [ring, setRing] = useState({ x: -100, y: -100 });
+  const mx = useMotionValue(-100);
+  const my = useMotionValue(-100);
+
+  const springCfg = { stiffness: 480, damping: 34, mass: 0.6 };
+  const x = useSpring(mx, springCfg);
+  const y = useSpring(my, springCfg);
+
+  const [hovered, setHovered] = useState(false);
   const [clicking, setClicking] = useState(false);
+  const rafRef = useRef<number | null>(null);
 
   useEffect(() => {
-    const moveDot = (e: MouseEvent) => setPos({ x: e.clientX, y: e.clientY });
-    const moveRing = (e: MouseEvent) => setRing({ x: e.clientX, y: e.clientY });
-    const down = () => setClicking(true);
-    const up = () => setClicking(false);
-    window.addEventListener("mousemove", moveDot);
-    window.addEventListener("mousemove", moveRing);
-    window.addEventListener("mousedown", down);
-    window.addEventListener("mouseup", up);
-    return () => {
-      window.removeEventListener("mousemove", moveDot);
-      window.removeEventListener("mousemove", moveRing);
-      window.removeEventListener("mousedown", down);
-      window.removeEventListener("mouseup", up);
+    const onMove = (e: MouseEvent) => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(() => {
+        mx.set(e.clientX);
+        my.set(e.clientY);
+      });
     };
-  }, []);
+    const onDown = () => setClicking(true);
+    const onUp   = () => setClicking(false);
+
+    const checkHover = (e: MouseEvent) => {
+      const el = e.target as HTMLElement;
+      setHovered(
+        !!el.closest("a, button, [role=button], input, textarea, select, label")
+      );
+    };
+
+    window.addEventListener("mousemove", onMove, { passive: true });
+    window.addEventListener("mousemove", checkHover, { passive: true });
+    window.addEventListener("mousedown", onDown);
+    window.addEventListener("mouseup", onUp);
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mousemove", checkHover);
+      window.removeEventListener("mousedown", onDown);
+      window.removeEventListener("mouseup", onUp);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, [mx, my]);
+
+  const size = clicking ? 12 : hovered ? 28 : 20;
+  const lineLen = clicking ? 8 : hovered ? 18 : 14;
 
   return (
-    <>
-      {/* dot */}
+    <motion.div
+      style={{ x, y, translateX: "-50%", translateY: "-50%" }}
+      className="fixed top-0 left-0 z-[9999] pointer-events-none"
+    >
+      {/* Center circle */}
       <motion.div
-        className="fixed top-0 left-0 w-2 h-2 bg-violet-400 rounded-full pointer-events-none z-[9999] mix-blend-difference"
-        animate={{ x: pos.x - 4, y: pos.y - 4, scale: clicking ? 0.5 : 1 }}
-        transition={{ type: "spring", stiffness: 800, damping: 35, mass: 0.1 }}
+        animate={{
+          width: size,
+          height: size,
+          backgroundColor: hovered
+            ? "oklch(0.72 0.17 52)"
+            : "transparent",
+          borderColor: "oklch(0.72 0.17 52)",
+          borderWidth: clicking ? 2 : 1.5,
+        }}
+        transition={{ duration: 0.15, ease: "easeOut" }}
+        style={{ borderRadius: "50%", border: "1.5px solid oklch(0.72 0.17 52)" }}
       />
-      {/* ring */}
+
+      {/* Crosshair lines */}
+      {/* Top */}
       <motion.div
-        className="fixed top-0 left-0 w-8 h-8 border border-violet-400/50 rounded-full pointer-events-none z-[9998]"
-        animate={{ x: ring.x - 16, y: ring.y - 16, scale: clicking ? 1.5 : 1 }}
-        transition={{ type: "spring", stiffness: 150, damping: 18, mass: 0.5 }}
+        animate={{ height: lineLen, opacity: hovered ? 0.5 : 1 }}
+        transition={{ duration: 0.15 }}
+        style={{
+          position: "absolute",
+          left: "50%",
+          bottom: "calc(50% + 3px)",
+          width: "1px",
+          background: "oklch(0.72 0.17 52)",
+          translateX: "-50%",
+          transformOrigin: "bottom",
+        }}
       />
-    </>
+      {/* Bottom */}
+      <motion.div
+        animate={{ height: lineLen, opacity: hovered ? 0.5 : 1 }}
+        transition={{ duration: 0.15 }}
+        style={{
+          position: "absolute",
+          left: "50%",
+          top: "calc(50% + 3px)",
+          width: "1px",
+          background: "oklch(0.72 0.17 52)",
+          translateX: "-50%",
+          transformOrigin: "top",
+        }}
+      />
+      {/* Left */}
+      <motion.div
+        animate={{ width: lineLen, opacity: hovered ? 0.5 : 1 }}
+        transition={{ duration: 0.15 }}
+        style={{
+          position: "absolute",
+          top: "50%",
+          right: "calc(50% + 3px)",
+          height: "1px",
+          background: "oklch(0.72 0.17 52)",
+          translateY: "-50%",
+          transformOrigin: "right",
+        }}
+      />
+      {/* Right */}
+      <motion.div
+        animate={{ width: lineLen, opacity: hovered ? 0.5 : 1 }}
+        transition={{ duration: 0.15 }}
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: "calc(50% + 3px)",
+          height: "1px",
+          background: "oklch(0.72 0.17 52)",
+          translateY: "-50%",
+          transformOrigin: "left",
+        }}
+      />
+    </motion.div>
   );
 }

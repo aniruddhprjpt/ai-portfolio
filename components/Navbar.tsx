@@ -2,19 +2,19 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const navItems = ["About", "Projects", "Skills", "Experience", "Contact"];
+const NAV_ITEMS = ["About", "Projects", "Skills", "Experience", "Contact"];
 
 export default function Navbar({ firstName, email }: { firstName: string; email: string }) {
-  const [scrolled, setScrolled] = useState(false);
-  const [lastY, setLastY] = useState(0);
-  const [hidden, setHidden] = useState(false);
+  const [scrolled, setScrolled]   = useState(false);
+  const [lastY, setLastY]         = useState(0);
+  const [hidden, setHidden]       = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => {
       const y = window.scrollY;
-      setScrolled(y > 20);
-      setHidden(y > lastY && y > 100);
+      setScrolled(y > 24);
+      setHidden(y > lastY && y > 120);
       setLastY(y);
     };
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -23,38 +23,41 @@ export default function Navbar({ firstName, email }: { firstName: string; email:
 
   return (
     <motion.nav
-      animate={{ y: hidden ? -100 : 0 }}
-      transition={{ duration: 0.35, ease: "easeInOut" }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? "bg-[#05050f]/80 backdrop-blur-xl border-b border-white/[0.06] shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
-          : "bg-transparent"
-      }`}
+      animate={{ y: hidden ? -80 : 0 }}
+      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+      className="fixed top-0 left-0 right-0 z-50"
+      style={{
+        background: scrolled ? "oklch(0.07 0.000 0 / 0.85)" : "transparent",
+        backdropFilter: scrolled ? "blur(16px)" : "none",
+        borderBottom: scrolled ? "1px solid oklch(0.22 0.010 52)" : "1px solid transparent",
+        transition: "background 0.3s ease, border-color 0.3s ease",
+      }}
     >
-      <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo */}
         <motion.a
           href="#"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
-          className="font-heading font-black text-xl tracking-tight"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4 }}
+          className="font-display font-extrabold text-lg tracking-tight"
+          style={{ color: "var(--color-ink)", textDecoration: "none" }}
         >
-          <span className="gradient-text">{firstName}</span>
-          <span className="text-white/30">.dev</span>
-          <span className="animate-blink text-violet-400 ml-0.5">_</span>
+          {firstName}
+          <span style={{ color: "var(--color-primary)" }}>.</span>
+          <span style={{ color: "var(--color-muted)" }}>dev</span>
         </motion.a>
 
-        {/* Desktop Nav */}
-        <div className="hidden md:flex items-center gap-8 text-sm text-gray-400">
-          {navItems.map((item, i) => (
+        {/* Desktop links */}
+        <div className="hidden md:flex items-center gap-8">
+          {NAV_ITEMS.map((item, i) => (
             <motion.a
               key={item}
               href={`#${item.toLowerCase()}`}
-              initial={{ opacity: 0, y: -10 }}
+              initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 * i + 0.2 }}
-              className="nav-link hover:text-white transition-colors duration-200"
+              transition={{ delay: 0.08 * i + 0.15 }}
+              className="nav-link"
             >
               {item}
             </motion.a>
@@ -64,62 +67,68 @@ export default function Navbar({ firstName, email }: { firstName: string; email:
         {/* Hire Me */}
         <motion.a
           href={`mailto:${email}`}
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.97 }}
-          className="hidden md:inline-flex btn-gradient px-5 py-2 rounded-xl text-sm font-semibold items-center gap-2"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="hidden md:inline-flex btn-primary text-sm py-2 px-5"
         >
-          <span>Hire Me ✦</span>
+          Hire Me
         </motion.a>
 
         {/* Mobile hamburger */}
         <button
-          className="md:hidden w-9 h-9 flex flex-col justify-center items-center gap-1.5"
           onClick={() => setMobileOpen(!mobileOpen)}
+          className="md:hidden flex flex-col gap-1.5 p-1"
           aria-label="Toggle menu"
+          style={{ background: "none", border: "none" }}
         >
-          <motion.span
-            animate={{ rotate: mobileOpen ? 45 : 0, y: mobileOpen ? 7 : 0 }}
-            className="w-6 h-0.5 bg-white block origin-center"
-          />
-          <motion.span
-            animate={{ opacity: mobileOpen ? 0 : 1 }}
-            className="w-6 h-0.5 bg-white block"
-          />
-          <motion.span
-            animate={{ rotate: mobileOpen ? -45 : 0, y: mobileOpen ? -7 : 0 }}
-            className="w-6 h-0.5 bg-white block origin-center"
-          />
+          {[0, 1, 2].map((i) => (
+            <motion.span
+              key={i}
+              animate={{
+                rotate: mobileOpen && i === 0 ? 45 : mobileOpen && i === 2 ? -45 : 0,
+                y: mobileOpen && i === 0 ? 8 : mobileOpen && i === 2 ? -8 : 0,
+                opacity: mobileOpen && i === 1 ? 0 : 1,
+              }}
+              style={{
+                display: "block",
+                width: 24,
+                height: 1.5,
+                background: "var(--color-ink)",
+                transformOrigin: "center",
+              }}
+            />
+          ))}
         </button>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile drawer */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-[#05050f]/95 backdrop-blur-xl border-t border-white/[0.06] overflow-hidden"
+            style={{
+              background: "oklch(0.07 0.000 0 / 0.96)",
+              borderTop: "1px solid oklch(0.22 0.010 52)",
+              overflow: "hidden",
+            }}
           >
-            <div className="flex flex-col px-6 py-4 gap-4">
-              {navItems.map((item) => (
+            <div className="flex flex-col px-6 py-5 gap-4">
+              {NAV_ITEMS.map((item) => (
                 <a
                   key={item}
                   href={`#${item.toLowerCase()}`}
                   onClick={() => setMobileOpen(false)}
-                  className="text-gray-300 hover:text-white py-2 text-sm font-medium transition-colors"
+                  className="nav-link text-base"
+                  style={{ paddingBottom: 8, borderBottom: "1px solid oklch(0.22 0.010 52)" }}
                 >
                   {item}
                 </a>
               ))}
-              <a
-                href={`mailto:${email}`}
-                className="btn-gradient px-5 py-2.5 rounded-xl text-sm font-semibold text-center mt-2"
-              >
-                Hire Me ✦
+              <a href={`mailto:${email}`} className="btn-primary mt-2 justify-center">
+                Hire Me
               </a>
             </div>
           </motion.div>
