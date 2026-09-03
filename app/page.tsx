@@ -202,7 +202,8 @@ export default function Home() {
                     fontSize: "clamp(3.5rem, 10vw, 8rem)",
                     letterSpacing: "-0.02em",
                     textWrap: "balance",
-                    color: "var(--color-ink)",
+                    color: "#ffffff",
+                    textShadow: "0 0 40px rgba(0,0,0,0.9), 0 2px 8px rgba(0,0,0,0.95), 0 0 80px rgba(0,0,0,0.7)",
                   }}
                 >
                   {firstName}
@@ -218,6 +219,7 @@ export default function Home() {
                     fontSize: "clamp(3.5rem, 10vw, 8rem)",
                     letterSpacing: "-0.02em",
                     color: "var(--color-primary)",
+                    textShadow: "0 0 40px rgba(0,0,0,0.9), 0 2px 8px rgba(0,0,0,0.95), 0 0 80px rgba(0,0,0,0.7)",
                   }}
                 >
                   <ScrambleText text="Prajapati" delay={500} />
