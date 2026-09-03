@@ -1,64 +1,74 @@
 "use client";
 import { useEffect, useRef } from "react";
-import { motion, AnimatePresence, useMotionValue, useTransform, animate } from "framer-motion";
+import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 
 interface PreloaderProps {
   onComplete: () => void;
 }
 
 export default function Preloader({ onComplete }: PreloaderProps) {
-  /* ─── scan beam: 0 = far left, 1 = far right ─── */
+  /* ─── Scan beam progress 0 → 1 ───────────────────────────── */
   const progress = useMotionValue(0);
+  const clipPath  = useTransform(progress, (v) => `inset(0 ${((1 - v) * 100).toFixed(2)}% 0 0)`);
+  const beamLeft  = useTransform(progress, (v) => `${(v * 100).toFixed(2)}%`);
 
-  /* Clip-path on the bright letters: reveals left → right */
-  const clipPath = useTransform(
-    progress,
-    (v) => `inset(0 ${((1 - v) * 100).toFixed(2)}% 0 0)`
-  );
-
-  /* Horizontal position of the glow beam (0–100% of the screen) */
-  const beamLeft = useTransform(progress, (v) => `${(v * 100).toFixed(2)}%`);
-
-  /* Tagline / exit driven by a separate phase via refs */
-  const taglineRef = useRef<HTMLParagraphElement>(null);
+  /* ─── Tudum zoom + flash refs ─────────────────────────────── */
   const screenRef  = useRef<HTMLDivElement>(null);
+  const lettersRef = useRef<HTMLDivElement>(null);
+  const flashRef   = useRef<HTMLDivElement>(null);
+  const taglineRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
-    /* 1. Start the scan at t=300ms */
-    const ctrl = animate(progress, 1, {
-      delay: 0.3,
-      duration: 1.15,
-      ease: [0.25, 0.46, 0.45, 0.94],
+    /* 1 ── Scan beam left → right */
+    const scanCtrl = animate(progress, 1, {
+      delay:    0.25,
+      duration: 1.1,
+      ease:     [0.25, 0.46, 0.45, 0.94],
     });
 
-    /* 2. Fade in tagline after scan finishes */
+    /* 2 ── Tagline fades in after scan */
     const t1 = setTimeout(() => {
-      if (taglineRef.current) {
-        taglineRef.current.style.opacity = "1";
-        taglineRef.current.style.transform = "translateY(0)";
-      }
-    }, 1700);
+      if (!taglineRef.current) return;
+      taglineRef.current.style.opacity   = "1";
+      taglineRef.current.style.transform = "translateY(0)";
+    }, 1550);
 
-    /* 3. Slide screen UP (curtain wipe) */
+    /* 3 ── TUDUM ZOOM: letters scale out toward viewer */
     const t2 = setTimeout(() => {
-      if (screenRef.current) {
-        screenRef.current.style.transition = "transform 0.72s cubic-bezier(0.76, 0, 0.24, 1)";
-        screenRef.current.style.transform = "translateY(-100%)";
-      }
-    }, 2600);
+      const el = lettersRef.current;
+      if (!el) return;
+      el.style.transition = "transform 0.62s cubic-bezier(0.55, 0, 1, 0.45), filter 0.62s ease, opacity 0.62s ease";
+      el.style.transform  = "scale(14)";
+      el.style.filter     = "blur(12px) brightness(3)";
+      el.style.opacity    = "0";
+    }, 2200);
 
-    /* 4. Notify parent */
-    const t3 = setTimeout(() => onComplete(), 3350);
+    /* 4 ── Flash overlay fires with zoom */
+    const t3 = setTimeout(() => {
+      const fl = flashRef.current;
+      if (!fl) return;
+      fl.style.transition = "opacity 0.18s ease";
+      fl.style.opacity    = "1";
+      // Then snap cut to black and reveal portfolio
+      setTimeout(() => {
+        if (fl) fl.style.opacity = "0";
+        if (screenRef.current) screenRef.current.style.opacity = "0";
+      }, 180);
+    }, 2350);
+
+    /* 5 ── Done */
+    const t4 = setTimeout(() => onComplete(), 2750);
 
     return () => {
-      ctrl.stop();
+      scanCtrl.stop();
       clearTimeout(t1);
       clearTimeout(t2);
       clearTimeout(t3);
+      clearTimeout(t4);
     };
   }, [onComplete, progress]);
 
-  const LETTER_STYLE: React.CSSProperties = {
+  const LETTER: React.CSSProperties = {
     fontFamily:    "var(--font-display)",
     fontSize:      "clamp(7rem, 22vw, 13rem)",
     fontWeight:    900,
@@ -72,60 +82,61 @@ export default function Preloader({ onComplete }: PreloaderProps) {
     <div
       ref={screenRef}
       style={{
-        position:  "fixed",
-        inset:     0,
-        zIndex:    99999,
+        position:   "fixed",
+        inset:      0,
+        zIndex:     99999,
         background: "#000",
-        display:   "flex",
-        flexDirection: "column",
-        alignItems:    "center",
-        justifyContent: "center",
-        overflow: "hidden",
+        display:    "flex",
+        flexDirection:   "column",
+        alignItems:      "center",
+        justifyContent:  "center",
+        overflow:   "hidden",
+        transition: "opacity 0.25s ease",
       }}
     >
-      {/* ── Letter stack ── */}
-      <div style={{ position: "relative" }}>
+      {/* ── Letter group (zoom target) ── */}
+      <div ref={lettersRef} style={{ position: "relative", willChange: "transform" }}>
 
-        {/* DIM underlay — always visible, sets base shape */}
+        {/* Dim underlay */}
         <div aria-hidden style={{ display: "flex", gap: "0.02em" }}>
-          <span style={{ ...LETTER_STYLE, color: "rgba(217,119,6,0.10)" }}>A</span>
-          <span style={{ ...LETTER_STYLE, color: "rgba(217,119,6,0.10)" }}>P</span>
+          <span style={{ ...LETTER, color: "rgba(217,119,6,0.10)" }}>A</span>
+          <span style={{ ...LETTER, color: "rgba(217,119,6,0.10)" }}>P</span>
         </div>
 
-        {/* BRIGHT overlay — revealed left→right by clip-path */}
+        {/* Bright clip-reveal */}
         <motion.div
           aria-hidden
           style={{
             clipPath,
             position: "absolute",
-            inset:    0,
-            display:  "flex",
-            gap:      "0.02em",
+            inset: 0,
+            display: "flex",
+            gap: "0.02em",
           }}
         >
-          <span style={{ ...LETTER_STYLE, color: "#d97706" }}>A</span>
-          <span style={{ ...LETTER_STYLE, color: "#e8a020" }}>P</span>
+          <span style={{ ...LETTER, color: "#d97706" }}>A</span>
+          <span style={{ ...LETTER, color: "#e8a020" }}>P</span>
         </motion.div>
 
-        {/* GLOW overlay — same clip, softer luminous fill */}
+        {/* Blurred glow layer (same clip) */}
         <motion.div
           aria-hidden
           style={{
             clipPath,
             position: "absolute",
-            inset:    0,
-            display:  "flex",
-            gap:      "0.02em",
-            filter:   "blur(18px)",
-            opacity:  0.55,
+            inset: 0,
+            display: "flex",
+            gap: "0.02em",
+            filter: "blur(22px)",
+            opacity: 0.5,
           }}
         >
-          <span style={{ ...LETTER_STYLE, color: "#fbbf24" }}>A</span>
-          <span style={{ ...LETTER_STYLE, color: "#fbbf24" }}>P</span>
+          <span style={{ ...LETTER, color: "#fbbf24" }}>A</span>
+          <span style={{ ...LETTER, color: "#fbbf24" }}>P</span>
         </motion.div>
       </div>
 
-      {/* ── Scan beam — full-height amber stripe ── */}
+      {/* ── Scan beam ── */}
       <motion.div
         aria-hidden
         style={{
@@ -135,11 +146,11 @@ export default function Preloader({ onComplete }: PreloaderProps) {
           left:     beamLeft,
           width:    "4px",
           transform: "translateX(-50%)",
-          background: "rgba(255, 220, 140, 0.95)",
+          background: "rgba(255,220,140,0.95)",
           boxShadow: [
-            "0 0  6px 2px  rgba(217,119,6,0.85)",
-            "0 0 20px 8px  rgba(217,119,6,0.55)",
-            "0 0 55px 20px rgba(217,119,6,0.28)",
+            "0 0  6px  2px rgba(217,119,6,0.9)",
+            "0 0 22px  8px rgba(217,119,6,0.6)",
+            "0 0 60px 22px rgba(217,119,6,0.3)",
           ].join(", "),
         }}
       />
@@ -148,20 +159,33 @@ export default function Preloader({ onComplete }: PreloaderProps) {
       <p
         ref={taglineRef}
         style={{
-          position:  "absolute",
-          bottom:    "clamp(2rem, 6vh, 4rem)",
+          position:   "absolute",
+          bottom:     "clamp(2rem, 6vh, 4rem)",
           fontFamily: "var(--font-mono)",
-          fontSize:  "0.72rem",
+          fontSize:   "0.72rem",
           letterSpacing: "0.22em",
           textTransform: "uppercase",
-          color:     "rgba(217,119,6,0.55)",
-          opacity:   0,
-          transform: "translateY(10px)",
-          transition: "opacity 0.55s ease, transform 0.55s ease",
+          color:      "rgba(217,119,6,0.55)",
+          opacity:    0,
+          transform:  "translateY(10px)",
+          transition: "opacity 0.5s ease, transform 0.5s ease",
         }}
       >
         Aniruddh Prajapati &nbsp;·&nbsp; Portfolio
       </p>
+
+      {/* ── Flash overlay (fires during tudum zoom) ── */}
+      <div
+        ref={flashRef}
+        aria-hidden
+        style={{
+          position:   "absolute",
+          inset:      0,
+          background: "radial-gradient(ellipse at center, rgba(251,191,36,0.55) 0%, #000 70%)",
+          opacity:    0,
+          pointerEvents: "none",
+        }}
+      />
     </div>
   );
 }
