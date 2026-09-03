@@ -1,6 +1,7 @@
 "use client";
 import { useRef, useEffect, useState } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import Image from "next/image";
 
 export default function FloatingOrb() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -103,24 +104,27 @@ export default function FloatingOrb() {
         />
 
         {/* Avatar image — circular clipped */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/avatar.png"
-          alt="Aniruddh Prajapati"
-          onLoad={() => setImgLoaded(true)}
-          onError={() => setImgLoaded(false)}
+        <div
           style={{
             position: "absolute",
             inset: 6,
-            width: "calc(100% - 12px)",
-            height: "calc(100% - 12px)",
             borderRadius: "50%",
-            objectFit: "cover",
-            objectPosition: "top center",
+            overflow: "hidden",
             opacity: imgLoaded ? 1 : 0,
             transition: "opacity 0.4s ease",
           }}
-        />
+        >
+          <Image
+            src="/avatar.jpg"
+            alt="Aniruddh Prajapati"
+            fill
+            priority
+            sizes="190px"
+            style={{ objectFit: "cover", objectPosition: "top center" }}
+            onLoad={() => setImgLoaded(true)}
+            onError={() => setImgLoaded(false)}
+          />
+        </div>
 
         {/* Fallback monogram when no image */}
         {!imgLoaded && (
