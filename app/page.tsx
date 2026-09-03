@@ -8,6 +8,8 @@ import FMReveal from "@/components/FMReveal";
 import Navbar from "@/components/Navbar";
 import ScrollProgress from "@/components/ScrollProgress";
 import ScrambleText from "@/components/ScrambleText";
+import FloatingOrb from "@/components/FloatingOrb";
+import SkillBars from "@/components/SkillBars";
 import { portfolioData } from "@/data/portfolio";
 
 // Load WebThreads (ogl WebGL) client-only — avoids SSR/bundle issues
@@ -96,6 +98,33 @@ function Dot() {
 export default function Home() {
   const { name, bio, links, skills, experience, education, projects, email, languages } = portfolioData;
   const firstName = name.split(" ")[0];
+
+  /* Projects: filter + cursor-following preview */
+  const [activeFilter, setActiveFilter] = useState("All");
+  const [hoveredProject, setHoveredProject] = useState<number | null>(null);
+  const [expandedProject, setExpandedProject] = useState<number | null>(null);
+  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
+  const projectSectionRef = useRef<HTMLElement>(null);
+
+  const PROJECT_FILTERS = ["All", "AI/ML", "Full Stack", "Web"];
+  const PROJECT_COLORS = [
+    "linear-gradient(135deg, #d97706, #f97316)",
+    "linear-gradient(135deg, #22d3ee, #3b82f6)",
+    "linear-gradient(135deg, #4ade80, #22d3ee)",
+    "linear-gradient(135deg, #d97706, #a855f7)",
+  ];
+  const PROJECT_TAGS: Record<string, string[]> = {
+    "SmartDine — AI Restaurant Management System": ["AI/ML", "Full Stack"],
+    "StudyMind AI — Study Smarter. Not Harder.": ["AI/ML", "Full Stack", "Web"],
+    "FlatFlow — Shared House Management App": ["Full Stack", "Web"],
+    "AI Portfolio Assistant": ["AI/ML", "Web"],
+  };
+
+  const filteredProjects = projects.filter((p) =>
+    activeFilter === "All" || (PROJECT_TAGS[p.name] ?? []).includes(activeFilter)
+  );
+
+  const SKILL_BARS_CATEGORIES = ["languages", "web_development", "databases", "ai_and_ml", "devops_tools"];
 
   /* Mouse parallax for hero */
   const rawX = useMotionValue(0);
@@ -302,6 +331,9 @@ export default function Home() {
               transition={{ delay: 0.55, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="hidden md:block"
             >
+              {/* 3D Floating Orb — cursor reactive */}
+              <FloatingOrb />
+
               <div
                 className="card p-6"
                 style={{ borderColor: "oklch(0.22 0.010 52)" }}
@@ -437,7 +469,15 @@ export default function Home() {
       {/* ══════════════════════════════════════════
           PROJECTS — numbered list format
       ══════════════════════════════════════════ */}
-      <section id="projects" style={{ padding: "7rem 0", background: "var(--color-surface)", position: "relative" }}>
+      <section
+        id="projects"
+        ref={projectSectionRef}
+        onMouseMove={(e) => {
+          const rect = projectSectionRef.current?.getBoundingClientRect();
+          if (rect) setCursorPos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+        }}
+        style={{ padding: "7rem 0", background: "var(--color-surface)", position: "relative" }}
+      >
         <div
           aria-hidden
           style={{
@@ -447,24 +487,93 @@ export default function Home() {
             pointerEvents: "none",
           }}
         />
+
+        {/* Cursor-following project preview */}
+        <div
+          style={{
+            position: "absolute",
+            left: cursorPos.x + 24,
+            top: cursorPos.y - 90,
+            width: 220,
+            height: 140,
+            borderRadius: 12,
+            background: hoveredProject !== null ? PROJECT_COLORS[projects.indexOf(filteredProjects[hoveredProject]) % PROJECT_COLORS.length] : "transparent",
+            opacity: hoveredProject !== null ? 1 : 0,
+            transform: `scale(${hoveredProject !== null ? 1 : 0.88})`,
+            transition: "opacity 0.22s ease, transform 0.22s ease, background 0.3s ease",
+            pointerEvents: "none",
+            zIndex: 10,
+            boxShadow: "0 12px 40px rgba(0,0,0,0.4)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            overflow: "hidden",
+          }}
+        >
+          {hoveredProject !== null && (
+            <div style={{ textAlign: "center", padding: "1rem" }}>
+              <div style={{ fontSize: "0.65rem", fontFamily: "var(--font-mono)", color: "rgba(0,0,0,0.6)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "0.4rem" }}>
+                {filteredProjects[hoveredProject]?.tech.slice(0, 3).join(" · ")}
+              </div>
+              <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "rgba(0,0,0,0.8)" }}>
+                View Project ↗
+              </div>
+            </div>
+          )}
+        </div>
+
         <div className="max-w-7xl mx-auto px-6 relative">
           <FMReveal>
             <p className="section-label mb-3">Projects</p>
             <h2
               className="font-display font-extrabold"
-              style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", letterSpacing: "-0.02em", marginBottom: "4rem" }}
+              style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", letterSpacing: "-0.02em", marginBottom: "2rem" }}
             >
               Things I&apos;ve <span style={{ color: "var(--color-primary)" }}>Built</span>
             </h2>
           </FMReveal>
 
+          {/* Filter tabs */}
+          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginBottom: "3rem" }}>
+            {PROJECT_FILTERS.map((f) => (
+              <motion.button
+                key={f}
+                onClick={() => { setActiveFilter(f); setExpandedProject(null); }}
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.97 }}
+                style={{
+                  padding: "0.4rem 1rem",
+                  borderRadius: 999,
+                  border: `1px solid ${activeFilter === f ? "var(--color-primary)" : "var(--color-border)"}`,
+                  background: activeFilter === f ? "oklch(0.72 0.17 52 / 0.12)" : "transparent",
+                  color: activeFilter === f ? "var(--color-primary)" : "var(--color-muted)",
+                  fontSize: "0.8rem",
+                  fontFamily: "var(--font-mono)",
+                  letterSpacing: "0.04em",
+                  cursor: "pointer",
+                  transition: "all 0.18s ease",
+                }}
+              >
+                {f}
+                {f !== "All" && (
+                  <span style={{ marginLeft: "0.4rem", fontSize: "0.7rem", opacity: 0.6 }}>
+                    {projects.filter((p) => (PROJECT_TAGS[p.name] ?? []).includes(f)).length}
+                  </span>
+                )}
+              </motion.button>
+            ))}
+          </div>
+
           <div style={{ display: "flex", flexDirection: "column" }}>
-            {projects.map((project, i) => (
+            {filteredProjects.map((project, i) => (
               <FMReveal key={project.name} delay={i * 0.08}>
                 <motion.div
                   initial="rest"
                   whileHover="hover"
                   animate="rest"
+                  onMouseEnter={() => setHoveredProject(i)}
+                  onMouseLeave={() => setHoveredProject(null)}
+                  onClick={() => setExpandedProject(expandedProject === i ? null : i)}
                   style={{
                     padding: "2rem 0",
                     borderBottom: "1px solid var(--color-border)",
@@ -473,9 +582,10 @@ export default function Home() {
                     gap: "1.5rem",
                     alignItems: "start",
                     position: "relative",
+                    cursor: "pointer",
                   }}
                 >
-                  {/* Amber left accent line — draws in on hover */}
+                  {/* Amber left accent line */}
                   <motion.div
                     variants={{ rest: { scaleY: 0, opacity: 0 }, hover: { scaleY: 1, opacity: 1 } }}
                     transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
@@ -489,7 +599,7 @@ export default function Home() {
                       borderRadius: 1,
                     }}
                   />
-                  {/* Index — scales up on row hover via variant propagation */}
+                  {/* Index */}
                   <motion.span
                     variants={{ rest: { scale: 1, color: "oklch(0.72 0.17 52)" }, hover: { scale: 1.15, color: "oklch(0.82 0.17 52)" } }}
                     transition={{ duration: 0.18 }}
@@ -524,33 +634,48 @@ export default function Home() {
                     <p style={{ color: "var(--color-muted)", fontSize: "0.9rem", lineHeight: 1.65, marginBottom: "1rem", maxWidth: "68ch" }}>
                       {project.description}
                     </p>
-                    {/* Highlights (only for featured) */}
-                    {i === 1 && (
-                      <ul style={{ marginBottom: "1rem", display: "flex", flexDirection: "column", gap: "0.4rem" }}>
-                        {project.highlights.slice(0, 3).map((h) => (
-                          <li key={h} style={{ color: "var(--color-muted)", fontSize: "0.82rem", display: "flex", gap: "0.5rem", lineHeight: 1.5 }}>
-                            <span style={{ color: "var(--color-primary)", flexShrink: 0 }}>▹</span>
+                    {/* Expandable highlights */}
+                    <motion.div
+                      initial={false}
+                      animate={{ height: expandedProject === i ? "auto" : 0, opacity: expandedProject === i ? 1 : 0 }}
+                      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                      style={{ overflow: "hidden" }}
+                    >
+                      <ul style={{ marginBottom: "1rem", display: "flex", flexDirection: "column", gap: "0.45rem", paddingTop: "0.25rem" }}>
+                        {project.highlights.map((h) => (
+                          <li key={h} style={{ color: "var(--color-muted)", fontSize: "0.82rem", display: "flex", gap: "0.5rem", lineHeight: 1.55 }}>
+                            <span style={{ color: "var(--color-primary)", flexShrink: 0, marginTop: "0.1rem" }}>▹</span>
                             {h}
                           </li>
                         ))}
                       </ul>
-                    )}
+                    </motion.div>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
                       {project.tech.slice(0, 6).map((t) => (
                         <span key={t} className="badge" style={{ fontSize: "0.72rem" }}>{t}</span>
                       ))}
+                    </div>
+                    <div style={{ marginTop: "0.75rem", fontSize: "0.75rem", fontFamily: "var(--font-mono)", color: "var(--color-muted)", display: "flex", alignItems: "center", gap: "0.3rem" }}>
+                      <motion.span
+                        animate={{ rotate: expandedProject === i ? 90 : 0 }}
+                        transition={{ duration: 0.22 }}
+                        style={{ display: "inline-block" }}
+                      >▶</motion.span>
+                      {expandedProject === i ? "Collapse" : "Show highlights"}
                     </div>
                   </div>
 
                   {/* Links */}
                   <div style={{ display: "flex", gap: "0.5rem", flexShrink: 0, paddingTop: "0.2rem" }}>
                     {project.live && (
-                      <a href={project.live} target="_blank" rel="noopener noreferrer" className="icon-btn" aria-label={`${project.name} live demo`}>
+                      <a href={project.live} target="_blank" rel="noopener noreferrer" className="icon-btn" aria-label={`${project.name} live demo`}
+                        onClick={(e) => e.stopPropagation()}>
                         <ExternalIcon />
                       </a>
                     )}
                     {project.github && (
-                      <a href={project.github} target="_blank" rel="noopener noreferrer" className="icon-btn" aria-label={`${project.name} GitHub`}>
+                      <a href={project.github} target="_blank" rel="noopener noreferrer" className="icon-btn" aria-label={`${project.name} GitHub`}
+                        onClick={(e) => e.stopPropagation()}>
                         <GithubIcon />
                       </a>
                     )}
@@ -584,7 +709,10 @@ export default function Home() {
                   <p className="font-mono section-label" style={{ paddingTop: "0.25rem" }}>
                     {category.replace(/_/g, " ")}
                   </p>
-                  <BadgeList items={items as string[]} />
+                  {SKILL_BARS_CATEGORIES.includes(category)
+                    ? <SkillBars skills={items as string[]} />
+                    : <BadgeList items={items as string[]} />
+                  }
                 </div>
               </FMReveal>
             ))}
