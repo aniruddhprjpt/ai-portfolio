@@ -10,6 +10,7 @@ import ScrollProgress from "@/components/ScrollProgress";
 import ScrambleText from "@/components/ScrambleText";
 import FloatingOrb from "@/components/FloatingOrb";
 import SkillBars from "@/components/SkillBars";
+import Preloader from "@/components/Preloader";
 import { portfolioData } from "@/data/portfolio";
 
 // Load WebThreads (ogl WebGL) client-only — avoids SSR/bundle issues
@@ -126,6 +127,16 @@ export default function Home() {
 
   const SKILL_BARS_CATEGORIES = ["languages", "web_development", "databases", "ai_and_ml", "devops_tools"];
 
+  /* Preloader */
+  const [showPreloader, setShowPreloader] = useState(() => {
+    // Only show once per session
+    if (typeof window !== "undefined") {
+      const seen = sessionStorage.getItem("__ap_preloader_seen");
+      if (seen) return false;
+    }
+    return true;
+  });
+
   /* Mouse parallax for hero */
   const rawX = useMotionValue(0);
   const rawY = useMotionValue(0);
@@ -142,6 +153,15 @@ export default function Home() {
   }, [rawX, rawY]);
 
   return (
+    <>
+      {showPreloader && (
+        <Preloader
+          onComplete={() => {
+            sessionStorage.setItem("__ap_preloader_seen", "1");
+            setShowPreloader(false);
+          }}
+        />
+      )}
     <main style={{ background: "var(--color-bg)", color: "var(--color-ink)", overflowX: "hidden" }}>
       <ScrollProgress />
       <Navbar firstName={firstName} email={email} />
@@ -889,5 +909,6 @@ export default function Home() {
 
       <Chatbot />
     </main>
+    </>
   );
 }
