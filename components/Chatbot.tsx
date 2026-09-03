@@ -16,7 +16,6 @@ const SUGGESTED_QUESTIONS = [
 ];
 
 function MarkdownText({ text }: { text: string }) {
-  // Simple markdown renderer for bold, bullet points, and links
   const lines = text.split("\n");
   return (
     <div className="space-y-1">
@@ -30,7 +29,7 @@ function MarkdownText({ text }: { text: string }) {
         if (line.startsWith("- ")) {
           return (
             <div key={i} className="flex gap-2">
-              <span className="mt-1 text-indigo-400">•</span>
+              <span className="mt-1" style={{ color: "#d97706" }}>•</span>
               <span>{renderInline(line.replace("- ", ""))}</span>
             </div>
           );
@@ -43,7 +42,6 @@ function MarkdownText({ text }: { text: string }) {
 }
 
 function renderInline(text: string) {
-  // Bold: **text**
   const parts = text.split(/(\*\*[^*]+\*\*)/g);
   return parts.map((part, i) => {
     if (part.startsWith("**") && part.endsWith("**")) {
@@ -130,8 +128,11 @@ export default function Chatbot() {
       {/* Floating Chat Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 text-white rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-110"
-        style={{ background: "linear-gradient(135deg, #6366f1, #a855f7)", boxShadow: "0 0 30px rgba(139,92,246,0.5)" }}
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 text-black rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-110"
+        style={{
+          background: "#d97706",
+          boxShadow: "0 0 30px rgba(217,119,6,0.55)",
+        }}
         aria-label="Open AI chat"
       >
         {isOpen ? (
@@ -148,17 +149,26 @@ export default function Chatbot() {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 z-50 w-[370px] max-w-[calc(100vw-2rem)] rounded-2xl flex flex-col overflow-hidden"
-          style={{ height: "500px", background: "rgba(10,10,20,0.95)", border: "1px solid rgba(99,102,241,0.2)", boxShadow: "0 25px 80px rgba(99,102,241,0.25)" }}>
-
+        <div
+          className="fixed bottom-24 right-6 z-50 w-[370px] max-w-[calc(100vw-2rem)] rounded-2xl flex flex-col overflow-hidden"
+          style={{
+            height: "500px",
+            background: "rgba(10,10,14,0.97)",
+            border: "1px solid rgba(217,119,6,0.25)",
+            boxShadow: "0 25px 80px rgba(217,119,6,0.2)",
+          }}
+        >
           {/* Header */}
-          <div className="px-4 py-3 flex items-center gap-3" style={{ background: "linear-gradient(135deg, #4f46e5, #7c3aed)" }}>
-            <div className="w-9 h-9 bg-white/20 rounded-full flex items-center justify-center text-lg font-bold">
+          <div
+            className="px-4 py-3 flex items-center gap-3"
+            style={{ background: "linear-gradient(135deg, #b45309, #d97706)" }}
+          >
+            <div className="w-9 h-9 bg-black/20 rounded-full flex items-center justify-center text-lg font-bold text-black">
               {portfolioData.name.charAt(0)}
             </div>
             <div>
-              <p className="text-white font-semibold text-sm">{portfolioData.name}</p>
-              <p className="text-indigo-200 text-xs">AI Portfolio Assistant • Online</p>
+              <p className="text-black font-semibold text-sm">{portfolioData.name}</p>
+              <p className="text-black/60 text-xs">AI Portfolio Assistant • Online</p>
             </div>
             <div className="ml-auto w-2 h-2 bg-green-400 rounded-full" />
           </div>
@@ -168,11 +178,12 @@ export default function Chatbot() {
             {messages.map((msg, i) => (
               <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                 <div
-                  className={`max-w-[85%] px-3 py-2 rounded-2xl text-sm leading-relaxed ${
+                  className={`max-w-[85%] px-3 py-2 rounded-2xl text-sm leading-relaxed`}
+                  style={
                     msg.role === "user"
-                      ? "bg-indigo-600 text-white rounded-br-sm"
-                      : "bg-gray-800 text-gray-100 rounded-bl-sm"
-                  }`}
+                      ? { background: "#d97706", color: "#000", borderBottomRightRadius: "4px" }
+                      : { background: "rgba(255,255,255,0.06)", color: "#f5f5f5", borderBottomLeftRadius: "4px" }
+                  }
                 >
                   {msg.role === "assistant" ? (
                     <MarkdownText text={msg.content} />
@@ -186,11 +197,11 @@ export default function Chatbot() {
             {/* Loading indicator */}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-gray-800 px-4 py-3 rounded-2xl rounded-bl-sm">
+                <div className="px-4 py-3 rounded-2xl rounded-bl-sm" style={{ background: "rgba(255,255,255,0.06)" }}>
                   <div className="flex gap-1">
-                    <span className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                    <span className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                    <span className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                    <span className="w-2 h-2 rounded-full animate-bounce" style={{ background: "#d97706", animationDelay: "0ms" }} />
+                    <span className="w-2 h-2 rounded-full animate-bounce" style={{ background: "#d97706", animationDelay: "150ms" }} />
+                    <span className="w-2 h-2 rounded-full animate-bounce" style={{ background: "#d97706", animationDelay: "300ms" }} />
                   </div>
                 </div>
               </div>
@@ -199,12 +210,19 @@ export default function Chatbot() {
             {/* Suggested questions */}
             {showSuggestions && messages.length === 1 && (
               <div className="space-y-2 pt-1">
-                <p className="text-gray-500 text-xs">Try asking:</p>
+                <p className="text-xs" style={{ color: "rgba(217,119,6,0.6)" }}>Try asking:</p>
                 {SUGGESTED_QUESTIONS.map((q) => (
                   <button
                     key={q}
                     onClick={() => sendMessage(q)}
-                    className="block w-full text-left px-3 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs rounded-xl border border-gray-700 transition-colors"
+                    className="block w-full text-left px-3 py-2 text-xs rounded-xl transition-colors"
+                    style={{
+                      background: "rgba(217,119,6,0.08)",
+                      border: "1px solid rgba(217,119,6,0.2)",
+                      color: "#d4d4d4",
+                    }}
+                    onMouseEnter={e => (e.currentTarget.style.background = "rgba(217,119,6,0.16)")}
+                    onMouseLeave={e => (e.currentTarget.style.background = "rgba(217,119,6,0.08)")}
                   >
                     {q}
                   </button>
@@ -216,7 +234,7 @@ export default function Chatbot() {
           </div>
 
           {/* Input */}
-          <div className="border-t border-gray-700 px-3 py-3 flex gap-2">
+          <div className="px-3 py-3 flex gap-2" style={{ borderTop: "1px solid rgba(217,119,6,0.15)" }}>
             <input
               ref={inputRef}
               type="text"
@@ -225,12 +243,21 @@ export default function Chatbot() {
               onKeyDown={handleKeyDown}
               placeholder="Ask me anything..."
               disabled={isLoading}
-              className="flex-1 bg-gray-800 text-gray-100 placeholder-gray-500 text-sm px-3 py-2 rounded-xl border border-gray-700 focus:outline-none focus:border-indigo-500 disabled:opacity-50"
+              className="flex-1 text-gray-100 placeholder-gray-500 text-sm px-3 py-2 rounded-xl focus:outline-none disabled:opacity-50"
+              style={{
+                background: "rgba(255,255,255,0.06)",
+                border: "1px solid rgba(217,119,6,0.2)",
+              }}
+              onFocus={e => (e.currentTarget.style.borderColor = "rgba(217,119,6,0.6)")}
+              onBlur={e => (e.currentTarget.style.borderColor = "rgba(217,119,6,0.2)")}
             />
             <button
               onClick={() => sendMessage(input)}
               disabled={!input.trim() || isLoading}
-              className="w-9 h-9 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white rounded-xl flex items-center justify-center transition-colors"
+              className="w-9 h-9 text-black rounded-xl flex items-center justify-center transition-colors disabled:opacity-40"
+              style={{ background: "#d97706" }}
+              onMouseEnter={e => (e.currentTarget.style.background = "#b45309")}
+              onMouseLeave={e => (e.currentTarget.style.background = "#d97706")}
             >
               <svg className="w-4 h-4 rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
