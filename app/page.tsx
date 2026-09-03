@@ -8,7 +8,6 @@ import FMReveal from "@/components/FMReveal";
 import Navbar from "@/components/Navbar";
 import ScrollProgress from "@/components/ScrollProgress";
 import ScrambleText from "@/components/ScrambleText";
-import CustomCursor from "@/components/CustomCursor";
 import { portfolioData } from "@/data/portfolio";
 
 // Load WebThreads (ogl WebGL) client-only — avoids SSR/bundle issues
@@ -116,7 +115,6 @@ export default function Home() {
   return (
     <main style={{ background: "var(--color-bg)", color: "var(--color-ink)", overflowX: "hidden" }}>
       <ScrollProgress />
-      <CustomCursor />
       <Navbar firstName={firstName} email={email} />
 
       {/* ══════════════════════════════════════════

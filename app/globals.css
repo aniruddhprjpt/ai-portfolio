@@ -235,11 +235,14 @@ body {
 .nav-link:hover::after { width: 100%; }
 
 /* ============================================================
-   CURSOR — hide OS cursor on pointer-fine devices;
-   CustomCursor component renders the amber dot + ring
+   CURSOR — amber arrow (CSS SVG data URI, no JS needed)
 ============================================================ */
-@media (pointer: fine) {
-  *, *::before, *::after { cursor: none !important; }
+*, *::before, *::after {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 22 22'%3E%3Cpath d='M3 1 L3 18 L7 14 L10 20.5 L12.2 19.5 L9.2 13 L15 13 Z' fill='%23D97706' stroke='%23000' stroke-width='1.2' stroke-linejoin='round'/%3E%3C/svg%3E") 3 1, auto !important;
+}
+
+a, button, [role=button], select, label[for] {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 22 22'%3E%3Cpath d='M3 1 L3 18 L7 14 L10 20.5 L12.2 19.5 L9.2 13 L15 13 Z' fill='%23D97706' stroke='%23000' stroke-width='1.2' stroke-linejoin='round'/%3E%3C/svg%3E") 3 1, pointer !important;
 }
 
 /* ============================================================
