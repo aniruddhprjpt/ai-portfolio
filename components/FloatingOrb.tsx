@@ -1,16 +1,17 @@
 "use client";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 
 export default function FloatingOrb() {
   const containerRef = useRef<HTMLDivElement>(null);
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
+  const [imgLoaded, setImgLoaded] = useState(false);
 
-  const rotateX = useSpring(useTransform(mouseY, [-400, 400], [22, -22]), {
+  const rotateX = useSpring(useTransform(mouseY, [-400, 400], [18, -18]), {
     stiffness: 50, damping: 16,
   });
-  const rotateY = useSpring(useTransform(mouseX, [-400, 400], [-22, 22]), {
+  const rotateY = useSpring(useTransform(mouseX, [-400, 400], [-18, 18]), {
     stiffness: 50, damping: 16,
   });
 
@@ -34,7 +35,7 @@ export default function FloatingOrb() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        height: 200,
+        height: 220,
         marginBottom: "1.5rem",
       }}
     >
@@ -43,82 +44,130 @@ export default function FloatingOrb() {
           rotateX,
           rotateY,
           transformStyle: "preserve-3d",
-          width: 180,
-          height: 180,
+          width: 190,
+          height: 190,
           borderRadius: "50%",
           position: "relative",
         }}
-        animate={{ y: [0, -16, 0] }}
+        animate={{ y: [0, -14, 0] }}
         transition={{ repeat: Infinity, duration: 5.5, ease: "easeInOut" }}
       >
-        {/* Base sphere — amber radial gradient */}
+        {/* Outer pulsing glow ring 1 */}
+        <motion.div
+          animate={{ scale: [1, 1.07, 1], opacity: [0.5, 0.75, 0.5] }}
+          transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+          style={{
+            position: "absolute",
+            inset: -14,
+            borderRadius: "50%",
+            border: "1.5px solid oklch(0.72 0.17 52 / 0.55)",
+            pointerEvents: "none",
+          }}
+        />
+        {/* Outer pulsing glow ring 2 */}
+        <motion.div
+          animate={{ scale: [1, 1.14, 1], opacity: [0.25, 0.45, 0.25] }}
+          transition={{ repeat: Infinity, duration: 3, ease: "easeInOut", delay: 0.6 }}
+          style={{
+            position: "absolute",
+            inset: -28,
+            borderRadius: "50%",
+            border: "1px solid oklch(0.72 0.17 52 / 0.28)",
+            pointerEvents: "none",
+          }}
+        />
+        {/* Outer pulsing glow ring 3 — faintest */}
+        <motion.div
+          animate={{ scale: [1, 1.22, 1], opacity: [0.1, 0.22, 0.1] }}
+          transition={{ repeat: Infinity, duration: 3.5, ease: "easeInOut", delay: 1 }}
+          style={{
+            position: "absolute",
+            inset: -46,
+            borderRadius: "50%",
+            border: "1px solid oklch(0.72 0.17 52 / 0.15)",
+            pointerEvents: "none",
+          }}
+        />
+
+        {/* Amber glow base behind avatar */}
         <div
           style={{
             position: "absolute",
             inset: 0,
             borderRadius: "50%",
             background:
-              "radial-gradient(circle at 36% 28%, oklch(0.92 0.14 52) 0%, oklch(0.78 0.18 52) 30%, oklch(0.58 0.16 45) 62%, oklch(0.22 0.05 40) 100%)",
+              "radial-gradient(circle at 50% 50%, oklch(0.72 0.17 52 / 0.35) 0%, oklch(0.20 0.05 40 / 0.8) 100%)",
             boxShadow:
-              "0 0 60px oklch(0.72 0.17 52 / 0.7), 0 0 120px oklch(0.72 0.17 52 / 0.3), inset 0 -18px 36px rgba(0,0,0,0.45)",
+              "0 0 50px oklch(0.72 0.17 52 / 0.65), 0 0 100px oklch(0.72 0.17 52 / 0.3), inset 0 0 30px rgba(0,0,0,0.5)",
           }}
         />
-        {/* Primary specular highlight */}
+
+        {/* Avatar image — circular clipped */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/avatar.png"
+          alt="Aniruddh Prajapati"
+          onLoad={() => setImgLoaded(true)}
+          onError={() => setImgLoaded(false)}
+          style={{
+            position: "absolute",
+            inset: 6,
+            width: "calc(100% - 12px)",
+            height: "calc(100% - 12px)",
+            borderRadius: "50%",
+            objectFit: "cover",
+            objectPosition: "top center",
+            opacity: imgLoaded ? 1 : 0,
+            transition: "opacity 0.4s ease",
+          }}
+        />
+
+        {/* Fallback monogram when no image */}
+        {!imgLoaded && (
+          <div
+            style={{
+              position: "absolute",
+              inset: 6,
+              borderRadius: "50%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "oklch(0.14 0.018 52)",
+              fontSize: "3rem",
+              fontWeight: 800,
+              fontFamily: "var(--font-display)",
+              color: "oklch(0.72 0.17 52)",
+              letterSpacing: "-0.04em",
+            }}
+          >
+            AP
+          </div>
+        )}
+
+        {/* Amber border ring over image */}
         <div
           style={{
             position: "absolute",
-            top: "12%",
-            left: "16%",
-            width: "42%",
-            height: "28%",
+            inset: 0,
             borderRadius: "50%",
-            background:
-              "radial-gradient(ellipse, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0) 100%)",
-            transform: "rotate(-28deg)",
-          }}
-        />
-        {/* Secondary warm glow */}
-        <div
-          style={{
-            position: "absolute",
-            bottom: "16%",
-            right: "14%",
-            width: "22%",
-            height: "15%",
-            borderRadius: "50%",
-            background: "rgba(251,191,36,0.35)",
-            filter: "blur(8px)",
-          }}
-        />
-        {/* Subtle inner rim */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 7,
-            borderRadius: "50%",
-            border: "1px solid rgba(255,255,255,0.13)",
-          }}
-        />
-        {/* Outer glow ring */}
-        <motion.div
-          animate={{ scale: [1, 1.06, 1], opacity: [0.4, 0.65, 0.4] }}
-          transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-          style={{
-            position: "absolute",
-            inset: -16,
-            borderRadius: "50%",
-            border: "1px solid oklch(0.72 0.17 52 / 0.35)",
+            border: "2.5px solid oklch(0.72 0.17 52 / 0.7)",
+            boxShadow: "inset 0 -12px 24px rgba(0,0,0,0.35)",
             pointerEvents: "none",
           }}
         />
-        <motion.div
-          animate={{ scale: [1, 1.12, 1], opacity: [0.2, 0.38, 0.2] }}
-          transition={{ repeat: Infinity, duration: 3, ease: "easeInOut", delay: 0.5 }}
+
+        {/* Gloss highlight over the top */}
+        <div
           style={{
             position: "absolute",
-            inset: -32,
+            top: "8%",
+            left: "16%",
+            width: "40%",
+            height: "26%",
             borderRadius: "50%",
-            border: "1px solid oklch(0.72 0.17 52 / 0.18)",
+            background:
+              "radial-gradient(ellipse, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0) 100%)",
+            transform: "rotate(-20deg)",
             pointerEvents: "none",
           }}
         />
