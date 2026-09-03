@@ -7,7 +7,9 @@ import FMReveal from "@/components/FMReveal";
 import Navbar from "@/components/Navbar";
 import ScrollProgress from "@/components/ScrollProgress";
 import ScrambleText from "@/components/ScrambleText";
-import GridBloom from "@/components/GridBloom";
+import CustomCursor from "@/components/CustomCursor";
+// @ts-ignore – JSX component from react-bits, no types needed
+import WebThreads from "@/components/WebThreads";
 import { portfolioData } from "@/data/portfolio";
 
 /* ─── SVG Icons ─────────────────────────────────────────── */
@@ -112,14 +114,39 @@ export default function Home() {
   return (
     <main style={{ background: "var(--color-bg)", color: "var(--color-ink)", overflowX: "hidden" }}>
       <ScrollProgress />
+      <CustomCursor />
       <Navbar firstName={firstName} email={email} />
 
       {/* ══════════════════════════════════════════
           HERO — left-aligned asymmetric
       ══════════════════════════════════════════ */}
       <section className="relative min-h-screen" style={{ paddingTop: "6rem" }}>
-        {/* WebGL animated grid bloom — amber, mouse-reactive */}
-        <GridBloom color="#c87533" speed={0.5} gridScale={13} />
+        {/* WebGL silk threads — amber ↔ cyan, mouse-reactive */}
+        <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none" }}>
+          <WebThreads
+            color1="#d97706"
+            color2="#22d3ee"
+            color3="#f97316"
+            speed={0.18}
+            threadCount={7}
+            frequency={4.5}
+            spread={0.22}
+            taper={0.9}
+            position={0.5}
+            fanMode="center"
+            glow={0.025}
+            falloff={0.65}
+            thickness={1.0}
+            brightness={0.55}
+            opacity={0.9}
+            mirror={true}
+            shimmer={false}
+            grain={true}
+            grainIntensity={0.04}
+            mouseInteraction={true}
+            mouseStrength={0.28}
+          />
+        </div>
 
         {/* Subtle cyan glow bottom-left (layered over WebGL) */}
         <div

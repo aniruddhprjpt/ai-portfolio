@@ -1,113 +1,103 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
-import { motion, useMotionValue, useSpring } from "framer-motion";
+import { useEffect, useRef } from "react";
 
 export default function CustomCursor() {
-  const mx = useMotionValue(-200);
-  const my = useMotionValue(-200);
-
-  const springCfg = { stiffness: 380, damping: 30, mass: 0.5 };
-  const x = useSpring(mx, springCfg);
-  const y = useSpring(my, springCfg);
-
-  const [hovered, setHovered] = useState(false);
-  const [clicking, setClicking] = useState(false);
-  const raf = useRef<number | null>(null);
+  const dotRef  = useRef<HTMLDivElement>(null);
+  const ringRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const onMove = (e: MouseEvent) => {
-      if (raf.current) cancelAnimationFrame(raf.current);
-      raf.current = requestAnimationFrame(() => {
-        mx.set(e.clientX);
-        my.set(e.clientY);
-      });
-      const el = e.target as HTMLElement;
-      setHovered(!!el.closest("a, button, [role=button]"));
-    };
-    const onDown = () => setClicking(true);
-    const onUp   = () => setClicking(false);
+    const dot  = dotRef.current;
+    const ring = ringRef.current;
+    if (!dot || !ring) return;
 
-    window.addEventListener("mousemove", onMove, { passive: true });
-    window.addEventListener("mousedown", onDown);
-    window.addEventListener("mouseup",   onUp);
+    // Respect reduced-motion
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    let mx = -200, my = -200;   // mouse
+    let rx = -200, ry = -200;   // ring (lags)
+    let hover   = false;
+    let clicking = false;
+    let raf: number;
+
+    const onMove = (e: MouseEvent) => {
+      mx = e.clientX;
+      my = e.clientY;
+      hover = !!(e.target as HTMLElement).closest("a, button, [role=button]");
+    };
+    const onDown = () => { clicking = true; };
+    const onUp   = () => { clicking = false; };
+
+    window.addEventListener("mousemove",  onMove,  { passive: true });
+    window.addEventListener("mousedown",  onDown);
+    window.addEventListener("mouseup",    onUp);
+
+    const frame = () => {
+      // Dot: instant follow, offset so center aligns to pointer tip
+      dot.style.transform = `translate(${mx - 4}px, ${my - 4}px)`;
+
+      // Ring: spring follow
+      const lag = reduced ? 1 : 0.12;
+      rx += (mx - rx) * lag;
+      ry += (my - ry) * lag;
+      ring.style.transform = `translate(${rx - 16}px, ${ry - 16}px)`;
+
+      // States
+      const dotScale  = clicking ? "0.5" : "1";
+      const ringScale = hover ? "2.2" : clicking ? "0.7" : "1";
+
+      dot.style.scale  = dotScale;
+      ring.style.scale = ringScale;
+      ring.style.borderColor = hover
+        ? "oklch(0.72 0.17 52 / 0.9)"
+        : "oklch(0.72 0.17 52 / 0.45)";
+
+      raf = requestAnimationFrame(frame);
+    };
+
+    raf = requestAnimationFrame(frame);
+
     return () => {
+      cancelAnimationFrame(raf);
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("mousedown", onDown);
       window.removeEventListener("mouseup",   onUp);
-      if (raf.current) cancelAnimationFrame(raf.current);
     };
-  }, [mx, my]);
+  }, []);
 
   return (
-    <motion.div
-      style={{
-        x, y,
-        translateX: "-50%",
-        translateY: "-50%",
-        position: "fixed",
-        top: 0, left: 0,
-        zIndex: 9999,
-        pointerEvents: "none",
-        mixBlendMode: "normal",
-      }}
-    >
-      {/* Center dot */}
-      <motion.div
-        animate={{
-          width:  clicking ? 3 : hovered ? 6 : 5,
-          height: clicking ? 3 : hovered ? 6 : 5,
-          opacity: 1,
-        }}
-        transition={{ duration: 0.12 }}
+    <>
+      {/* Amber dot — instant */}
+      <div
+        ref={dotRef}
+        aria-hidden
         style={{
+          position: "fixed",
+          top: 0, left: 0,
+          width: 8, height: 8,
           borderRadius: "50%",
           background: "oklch(0.72 0.17 52)",
-          position: "absolute",
-          top: "50%", left: "50%",
-          transform: "translate(-50%, -50%)",
+          zIndex: 99999,
+          pointerEvents: "none",
+          willChange: "transform",
+          transition: "scale 0.12s ease",
         }}
       />
-
-      {/* Rotating text ring */}
-      <motion.div
-        animate={{
-          scale: clicking ? 0.7 : hovered ? 1.3 : 1,
-          opacity: hovered ? 0.7 : 1,
-        }}
-        transition={{ duration: 0.2 }}
+      {/* Amber ring — lagging */}
+      <div
+        ref={ringRef}
+        aria-hidden
         style={{
-          position: "absolute",
-          top: "50%", left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: 72, height: 72,
-          animation: "cursor-ring-spin 7s linear infinite",
+          position: "fixed",
+          top: 0, left: 0,
+          width: 32, height: 32,
+          borderRadius: "50%",
+          border: "1.5px solid oklch(0.72 0.17 52 / 0.45)",
+          zIndex: 99998,
+          pointerEvents: "none",
+          willChange: "transform",
+          transition: "scale 0.22s ease, border-color 0.18s ease",
         }}
-      >
-        <svg
-          width="72"
-          height="72"
-          viewBox="0 0 72 72"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <defs>
-            <path
-              id="cursorCircle"
-              d="M 36, 36 m -28, 0 a 28,28 0 1,1 56,0 a 28,28 0 1,1 -56,0"
-            />
-          </defs>
-          <text
-            fill="oklch(0.72 0.17 52)"
-            fontSize="7.5"
-            fontFamily="var(--font-geist-mono), monospace"
-            letterSpacing="2.5"
-          >
-            <textPath href="#cursorCircle">
-              ANIRUDDH · DEV · 2026 ·{" "}
-            </textPath>
-          </text>
-        </svg>
-      </motion.div>
-    </motion.div>
+      />
+    </>
   );
 }
