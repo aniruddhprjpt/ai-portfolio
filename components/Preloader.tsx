@@ -59,12 +59,16 @@ export default function Preloader({ onComplete }: PreloaderProps) {
     /* 5 ── Done */
     const t4 = setTimeout(() => onComplete(), 2750);
 
+    /* Safety net — never freeze the page beyond 4s */
+    const tSafe = setTimeout(() => onComplete(), 4000);
+
     return () => {
       scanCtrl.stop();
       clearTimeout(t1);
       clearTimeout(t2);
       clearTimeout(t3);
       clearTimeout(t4);
+      clearTimeout(tSafe);
     };
   }, [onComplete, progress]);
 

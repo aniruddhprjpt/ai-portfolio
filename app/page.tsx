@@ -127,15 +127,8 @@ export default function Home() {
 
   const SKILL_BARS_CATEGORIES = ["languages", "web_development", "databases", "ai_and_ml", "devops_tools"];
 
-  /* Preloader */
-  const [showPreloader, setShowPreloader] = useState(() => {
-    // Only show once per session
-    if (typeof window !== "undefined") {
-      const seen = sessionStorage.getItem("__ap_preloader_seen");
-      if (seen) return false;
-    }
-    return true;
-  });
+  /* Preloader — always show on every page load */
+  const [showPreloader, setShowPreloader] = useState(true);
 
   /* Mouse parallax for hero */
   const rawX = useMotionValue(0);
@@ -155,12 +148,7 @@ export default function Home() {
   return (
     <>
       {showPreloader && (
-        <Preloader
-          onComplete={() => {
-            sessionStorage.setItem("__ap_preloader_seen", "1");
-            setShowPreloader(false);
-          }}
-        />
+        <Preloader onComplete={() => setShowPreloader(false)} />
       )}
     <main style={{ background: "var(--color-bg)", color: "var(--color-ink)", overflowX: "hidden" }}>
       <ScrollProgress />
