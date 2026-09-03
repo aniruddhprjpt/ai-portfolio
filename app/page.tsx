@@ -241,7 +241,11 @@ export default function Home() {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}
                 className="font-body mb-5"
-                style={{ fontSize: "clamp(1rem, 2.5vw, 1.25rem)", color: "var(--color-muted)" }}
+                style={{
+                  fontSize: "clamp(1rem, 2.5vw, 1.25rem)",
+                  color: "var(--color-ink)",
+                  textShadow: "0 0 24px rgba(0,0,0,0.95), 0 2px 6px rgba(0,0,0,1)",
+                }}
               >
                 <span className="tw-cursor">
                   <Typewriter words={[
@@ -259,10 +263,11 @@ export default function Home() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7, duration: 0.5 }}
                 style={{
-                  color: "var(--color-muted)",
+                  color: "oklch(0.82 0.010 80)",
                   maxWidth: "56ch",
                   lineHeight: 1.7,
                   marginBottom: "2.5rem",
+                  textShadow: "0 0 24px rgba(0,0,0,0.95), 0 2px 6px rgba(0,0,0,1)",
                 }}
               >
                 {bio.split(".")[0]}.
