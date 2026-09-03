@@ -1,6 +1,7 @@
 "use client";
 import { motion, useInView, useMotionValue, useSpring, animate } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import Chatbot from "@/components/Chatbot";
 import Typewriter from "@/components/Typewriter";
 import FMReveal from "@/components/FMReveal";
@@ -8,9 +9,10 @@ import Navbar from "@/components/Navbar";
 import ScrollProgress from "@/components/ScrollProgress";
 import ScrambleText from "@/components/ScrambleText";
 import CustomCursor from "@/components/CustomCursor";
-// @ts-ignore – JSX component from react-bits, no types needed
-import WebThreads from "@/components/WebThreads";
 import { portfolioData } from "@/data/portfolio";
+
+// Load WebThreads (ogl WebGL) client-only — avoids SSR/bundle issues
+const WebThreads = dynamic(() => import("@/components/WebThreads"), { ssr: false });
 
 /* ─── SVG Icons ─────────────────────────────────────────── */
 const GithubIcon = () => (
